@@ -19,8 +19,14 @@ public class DetailActivity extends Activity {
 
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
+
+            Bundle args = new Bundle();
+            args.putParcelable(DetailActivityFragment.DETAIL_URI, getIntent().getData());
+
+            DetailActivityFragment activityFragment = new DetailActivityFragment();
+            activityFragment.setArguments(args);
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new DetailActivityFragment())
+                    .add(R.id.weather_detail_container, activityFragment)
                     .commit();
         }
     }

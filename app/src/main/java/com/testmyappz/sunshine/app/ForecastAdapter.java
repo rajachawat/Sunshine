@@ -79,10 +79,10 @@ public class ForecastAdapter extends CursorAdapter {
             }
         }
 
-        int icon = Utility.getIconResourceForWeatherCondition(weatherId);
+        //int icon = Utility.getIconResourceForWeatherCondition(weatherId);
         // Use placeholder image for now
         //ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-        viewHolder.iconView.setImageResource(icon);
+        //viewHolder.iconView.setImageResource(icon);
 
         long dateInMillies = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
         viewHolder.dateView.setText(Utility.getFriendlyDayString(context, dateInMillies));

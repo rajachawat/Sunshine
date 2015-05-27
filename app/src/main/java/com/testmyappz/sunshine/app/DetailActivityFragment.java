@@ -6,6 +6,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +30,12 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private static final String LOG_TAG = DetailActivityFragment.class.getName();
     private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
     private String forecastString;
-
+    static final String DETAIL_URI = "URI";
     private static final int DETAIL_LOADER = 0;
     private ShareActionProvider mShareActionProvider;
+
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
     private static final String[] DETAIL_COLUMNS = {
             WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
             WeatherContract.WeatherEntry.COLUMN_DATE,
@@ -70,6 +74,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private TextView mHumidityView;
     private TextView mWindView;
     private TextView mPressureView;
+    private Uri mUri;
+
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -78,6 +84,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle args = getArguments();
+        if (args != null) {
+            mUri = args.getParcelable(DetailActivityFragment.DETAIL_URI);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
@@ -125,22 +136,25 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
+        if (null != mUri) {
 
-        if (intent == null) {
-            return null;
+            return new CursorLoader(getActivity(), mUri, DETAIL_COLUMNS, null, null, null);
         }
 
-        return new CursorLoader(getActivity(), intent.getData(), DETAIL_COLUMNS, null, null, null);
+        return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         if (data != null && data.moveToFirst()) {
+            Log.v(LOG_TAG, " data not null ");
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
+            Log.v(LOG_TAG, " weatherid= " + weatherId);
+            int artResourceForWeatherCondition = Utility.getArtResourceForWeatherCondition(weatherId);
 
-            mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
+            Log.v(LOG_TAG, "art id: " + artResourceForWeatherCondition);
+            mIconView.setImageResource(artResourceForWeatherCondition);
 
             String dateString = Utility.getFormattedMonthDay(getActivity(), data.getLong(COL_WEATHER_DATE));
             mDateView.setText(dateString);
@@ -185,5 +199,16 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    void onLocationChanged (String newLocation) {
+        Uri uri = mUri;
+        if (null != mUri) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+
+        }
     }
 }
