@@ -72,6 +72,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private static final String SELECTED_KEY = "selected_position";
     private ListView mListView;
+    private boolean mUseTodayView;
 
     public ForecastFragment() {
     }
@@ -100,6 +101,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        forecastAdapter.setUseTodayView(mUseTodayView);
 
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         mListView.setAdapter(forecastAdapter);
@@ -215,6 +217,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         forecastAdapter.swapCursor(null);
     }
 
+
+    public void setUseTodayView(boolean useTodayView) {
+        this.mUseTodayView = useTodayView;
+        if (forecastAdapter != null) {
+            forecastAdapter.setUseTodayView(useTodayView);
+        }
+    }
 
 }
 

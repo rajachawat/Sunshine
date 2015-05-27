@@ -36,7 +36,11 @@ public class MainActivity extends Activity implements ForecastFragment.Callback 
 
         } else {
             mTwoPane = false;
+            getActionBar().setElevation(0f);
         }
+
+        ForecastFragment forecastFragment = (ForecastFragment) getFragmentManager().findFragmentById(R.id.fragment_forecast);
+        forecastFragment.setUseTodayView(!mTwoPane);
     }
 
 
@@ -93,6 +97,7 @@ public class MainActivity extends Activity implements ForecastFragment.Callback 
         if (location != null && !location.equals(mLocation)) {
             Log.v(LOG_TAG, "Location changed: " + location);
             ForecastFragment ff = (ForecastFragment) getFragmentManager().findFragmentById(R.id.fragment_forecast);
+            ff.setUseTodayView(!mTwoPane);
             if (null != ff) {
                 ff.onLocationChanged();
             }

@@ -2,6 +2,7 @@ package com.testmyappz.sunshine.app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,10 @@ import com.testmyappz.sunshine.app.data.WeatherContract;
  */
 public class ForecastAdapter extends CursorAdapter {
     private final Context mContext;
+    public static final String LOG_TAG = ForecastAdapter.class.getSimpleName();
+
+    private boolean mUseTodayView;
+
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         mContext = context;
@@ -28,7 +33,11 @@ public class ForecastAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+        return position == 0 && mUseTodayView ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+    }
+
+    public void setUseTodayView(boolean useTodayView) {
+        this.mUseTodayView = useTodayView;
     }
 
     @Override
@@ -42,6 +51,7 @@ public class ForecastAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // Choose the layout type
+
         int viewType = getItemViewType(cursor.getPosition());
         int layoutId = viewType == VIEW_TYPE_TODAY ? R.layout.list_item_forecast_today : R.layout.list_item_forecast;
 
@@ -90,7 +100,7 @@ public class ForecastAdapter extends CursorAdapter {
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
         viewHolder.descriptionView.setText(description);
 
-
+        viewHolder.iconView.setContentDescription(description);
 
         // Read user preference for metric or imperial temperature units
         boolean isMetric = Utility.isMetric(context);

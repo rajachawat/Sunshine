@@ -148,19 +148,25 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         if (data != null && data.moveToFirst()) {
-            Log.v(LOG_TAG, " data not null ");
+
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
-            Log.v(LOG_TAG, " weatherid= " + weatherId);
+
             int artResourceForWeatherCondition = Utility.getArtResourceForWeatherCondition(weatherId);
 
-            Log.v(LOG_TAG, "art id: " + artResourceForWeatherCondition);
+
             mIconView.setImageResource(artResourceForWeatherCondition);
 
-            String dateString = Utility.getFormattedMonthDay(getActivity(), data.getLong(COL_WEATHER_DATE));
+            long date = data.getLong(COL_WEATHER_DATE);
+
+            String friendlyDateText = Utility.getDayName(getActivity(), date);
+            mFriendlyDateView.setText(friendlyDateText);
+
+            String dateString = Utility.getFormattedMonthDay(getActivity(), date);
             mDateView.setText(dateString);
 
             String weatherDescription = data.getString(COL_WEATHER_DESC);
             mDescriptionView.setText(weatherDescription);
+            mIconView.setContentDescription(weatherDescription);
 
             boolean isMetric = Utility.isMetric(getActivity());
 
